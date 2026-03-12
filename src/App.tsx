@@ -55,7 +55,7 @@ const LanguageSwitcher = () => {
 
   return (
     <div className="flex gap-1.5 mt-2 justify-center md:justify-end">
-      {['es', 'en', 'fr'].map((lng) => (
+      {['es', 'en'].map((lng) => (
         <button
           key={lng}
           onClick={() => changeLanguage(lng)}
@@ -829,43 +829,6 @@ export default function App() {
               title={t('como.paso3.title')} 
               description={t('como.paso3.desc')} 
             />
-          </motion.div>
-        </div>
-      </section>
-
-      {/* 5. CTA SECTION */}
-      <section className="py-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div 
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            className="orange-gradient p-16 md:p-24 rounded-[60px] relative overflow-hidden text-center"
-          >
-            <div className="absolute inset-0 bg-black/10" />
-            <div className="relative z-10">
-              <h2 className="text-5xl md:text-7xl font-display font-bold text-white mb-10">{t('cta.titulo')}</h2>
-              <p className="text-2xl text-white/90 mb-12 max-w-3xl mx-auto font-medium">
-                {t('cta.subtitulo')}
-              </p>
-              <div className="flex flex-col sm:flex-row gap-6 justify-center">
-                <motion.a 
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  href="tel:+34642379218" 
-                  className="px-12 py-6 bg-white text-brand-orange font-bold text-xl rounded-3xl shadow-2xl flex items-center justify-center gap-3"
-                >
-                  <Phone size={28} /> {t('cta.llamar')}
-                </motion.a>
-                <motion.a 
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  href="https://wa.me/34642379218" 
-                  className="px-12 py-6 bg-brand-dark text-white font-bold text-xl rounded-3xl shadow-2xl flex items-center justify-center gap-3"
-                >
-                  <MessageCircle size={28} /> {t('cta.whatsapp')}
-                </motion.a>
-              </div>
-            </div>
           </motion.div>
         </div>
       </section>
