@@ -23,9 +23,11 @@ import {
   X,
   ChevronRight,
   ArrowRight,
-  Star
+  Star,
+  Globe
 } from 'lucide-react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react';
+import { useTranslation } from 'react-i18next';
 
 // --- Variants for Animations ---
 
@@ -44,7 +46,34 @@ const staggerContainer = {
 
 // --- Components ---
 
+const LanguageSwitcher = () => {
+  const { i18n } = useTranslation();
+  
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+  };
+
+  return (
+    <div className="flex gap-1.5 mt-2 justify-center md:justify-end">
+      {['es', 'en', 'fr'].map((lng) => (
+        <button
+          key={lng}
+          onClick={() => changeLanguage(lng)}
+          className={`text-[10px] uppercase font-bold px-1.5 py-0.5 rounded border transition-all ${
+            i18n.language.startsWith(lng)
+              ? 'bg-brand-orange border-brand-orange text-white' 
+              : 'border-white/10 text-gray-500 hover:border-brand-orange/50 hover:text-brand-orange'
+          }`}
+        >
+          {lng}
+        </button>
+      ))}
+    </div>
+  );
+};
+
 const Navbar = () => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -55,11 +84,11 @@ const Navbar = () => {
   }, []);
 
   const navLinks = [
-    { name: 'Inicio', href: '#inicio' },
-    { name: 'Sobre Nosotros', href: '#sobre-nosotros' },
-    { name: 'Servicios', href: '#servicios' },
-    { name: 'Cómo Funciona', href: '#como-funciona' },
-    { name: 'Contacto', href: '#contacto' },
+    { name: t('nav.inicio'), href: '#inicio' },
+    { name: t('nav.sobre'), href: '#sobre-nosotros' },
+    { name: t('nav.servicios'), href: '#servicios' },
+    { name: t('nav.como'), href: '#como-funciona' },
+    { name: t('nav.contacto'), href: '#contacto' },
   ];
 
   return (
@@ -91,14 +120,17 @@ const Navbar = () => {
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-orange transition-all group-hover:w-full" />
               </motion.a>
             ))}
-            <motion.a 
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              href="#contacto" 
-              className="px-6 py-3 bg-brand-orange text-white text-sm font-bold rounded-full hover:shadow-[0_0_20px_rgba(242,125,38,0.4)] transition-all active:scale-95"
-            >
-              Solicitar Servicio
-            </motion.a>
+            <div className="flex flex-col items-end">
+              <motion.a 
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                href="#contacto" 
+                className="px-6 py-3 bg-brand-orange text-white text-sm font-bold rounded-full hover:shadow-[0_0_20px_rgba(242,125,38,0.4)] transition-all active:scale-95"
+              >
+                {t('nav.solicitar')}
+              </motion.a>
+              <LanguageSwitcher />
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
@@ -145,7 +177,7 @@ const Navbar = () => {
                 onClick={() => setIsOpen(false)}
                 className="block w-full text-center py-5 bg-brand-orange text-white text-xl font-bold rounded-2xl"
               >
-                Solicitar Servicio
+                {t('nav.solicitar')}
               </a>
             </div>
           </motion.div>
@@ -186,6 +218,7 @@ const Step = ({ number, title, description }: { number: string, title: string, d
 );
 
 export default function App() {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({ name: '', phone: '', message: '' });
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showLegal, setShowLegal] = useState(false);
@@ -221,7 +254,7 @@ export default function App() {
       }
     } catch (error) {
       console.error('Error submitting form:', error);
-      alert('Hubo un error al enviar la solicitud. Por favor, inténtalo de nuevo.');
+      alert(t('contacto.form.error') || 'Hubo un error al enviar la solicitud. Por favor, inténtalo de nuevo.');
     }
   };
 
@@ -243,7 +276,7 @@ export default function App() {
               onClick={resetViews}
               className="flex items-center gap-2 text-gray-400 hover:text-brand-orange transition-colors font-bold"
             >
-              <X size={20} /> Volver al Inicio
+              <X size={20} /> {t('common.volver')}
             </button>
           </div>
         </nav>
@@ -254,11 +287,11 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             className="max-w-4xl mx-auto glass-card p-8 md:p-16"
           >
-            <h1 className="text-4xl md:text-6xl font-display font-bold mb-12 text-brand-orange">Política de Privacidad</h1>
+            <h1 className="text-4xl md:text-6xl font-display font-bold mb-12 text-brand-orange">{t('footer.privacidad')}</h1>
             
             <div className="prose prose-invert prose-orange max-w-none space-y-8 text-gray-300 leading-relaxed text-lg">
               <p>
-                De conformidad con lo establecido en el Reglamento (UE) 2016/679 del Parlamento Europeo y del Consejo de 27 de abril de 2016 (GDPR) y la Ley Orgánica 3/2018, de Protección de Datos Personales y garantía de los derechos digitales (LOPDGDD), se informa a los usuarios del sitio web de la siguiente política de privacidad relativa al tratamiento de datos personales.
+                {t('privacy.intro')}
               </p>
 
               <section>
@@ -335,14 +368,14 @@ export default function App() {
                 onClick={resetViews}
                 className="px-10 py-4 bg-brand-orange text-white font-bold rounded-2xl hover:shadow-[0_0_30px_rgba(242,125,38,0.4)] transition-all"
               >
-                Volver al Inicio
+                {t('common.volver')}
               </button>
             </div>
           </motion.div>
         </main>
 
         <footer className="bg-brand-dark border-t border-white/5 py-12 text-center text-gray-500 text-sm">
-          <p>© 2024 FastMec. Todos los derechos reservados.</p>
+          <p>{t('footer.derechos')}</p>
         </footer>
       </div>
     );
@@ -360,7 +393,7 @@ export default function App() {
               onClick={resetViews}
               className="flex items-center gap-2 text-gray-400 hover:text-brand-orange transition-colors font-bold"
             >
-              <X size={20} /> Volver al Inicio
+              <X size={20} /> {t('common.volver')}
             </button>
           </div>
         </nav>
@@ -371,7 +404,7 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             className="max-w-4xl mx-auto glass-card p-8 md:p-16"
           >
-            <h1 className="text-4xl md:text-6xl font-display font-bold mb-12 text-brand-orange">Aviso Legal</h1>
+            <h1 className="text-4xl md:text-6xl font-display font-bold mb-12 text-brand-orange">{t('footer.aviso')}</h1>
             
             <div className="prose prose-invert prose-orange max-w-none space-y-8 text-gray-300 leading-relaxed text-lg">
               <p>
@@ -439,14 +472,14 @@ export default function App() {
                 onClick={resetViews}
                 className="px-10 py-4 bg-brand-orange text-white font-bold rounded-2xl hover:shadow-[0_0_30px_rgba(242,125,38,0.4)] transition-all"
               >
-                Volver al Inicio
+                {t('common.volver')}
               </button>
             </div>
           </motion.div>
         </main>
 
         <footer className="bg-brand-dark border-t border-white/5 py-12 text-center text-gray-500 text-sm">
-          <p>© 2024 FastMec. Todos los derechos reservados.</p>
+          <p>{t('footer.derechos')}</p>
         </footer>
       </div>
     );
@@ -464,7 +497,7 @@ export default function App() {
               onClick={resetViews}
               className="flex items-center gap-2 text-gray-400 hover:text-brand-orange transition-colors font-bold"
             >
-              <X size={20} /> Volver al Inicio
+              <X size={20} /> {t('common.volver')}
             </button>
           </div>
         </nav>
@@ -475,7 +508,7 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             className="max-w-4xl mx-auto glass-card p-8 md:p-16"
           >
-            <h1 className="text-4xl md:text-6xl font-display font-bold mb-12 text-brand-orange">Política de Cookies</h1>
+            <h1 className="text-4xl md:text-6xl font-display font-bold mb-12 text-brand-orange">{t('footer.cookies')}</h1>
             
             <div className="prose prose-invert prose-orange max-w-none space-y-8 text-gray-300 leading-relaxed text-lg">
               <section>
@@ -546,14 +579,14 @@ export default function App() {
                 onClick={resetViews}
                 className="px-10 py-4 bg-brand-orange text-white font-bold rounded-2xl hover:shadow-[0_0_30px_rgba(242,125,38,0.4)] transition-all"
               >
-                Volver al Inicio
+                {t('common.volver')}
               </button>
             </div>
           </motion.div>
         </main>
 
         <footer className="bg-brand-dark border-t border-white/5 py-12 text-center text-gray-500 text-sm">
-          <p>© 2024 FastMec. Todos los derechos reservados.</p>
+          <p>{t('footer.derechos')}</p>
         </footer>
       </div>
     );
@@ -592,15 +625,14 @@ export default function App() {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-orange/10 border border-brand-orange/20 text-brand-orange text-sm font-bold uppercase tracking-widest mb-8"
             >
               <span className="w-2 h-2 rounded-full bg-brand-orange animate-pulse" />
-              Servicio Disponible 24 Horas
+              {t('hero.disponible')}
             </motion.div>
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold leading-[1.1] mb-8 tracking-tight">
-              Tu taller de confianza <br />
-              <span className="text-brand-orange italic">sobre ruedas</span>
+              {t('hero.titulo')} <br />
+              <span className="text-brand-orange italic">{t('hero.subtitulo')}</span>
             </h1>
             <p className="text-lg md:text-xl lg:text-2xl text-gray-300 mb-12 leading-relaxed max-w-2xl font-medium">
-              Mecánica profesional a domicilio para coches, camiones y tractores. 
-              Llegamos donde estés en menos de 60 minutos.
+              {t('hero.descripcion')}
             </p>
             <div className="flex flex-col sm:flex-row gap-6 relative z-20">
               <motion.a 
@@ -609,7 +641,7 @@ export default function App() {
                 href="#contacto" 
                 className="px-10 py-5 bg-brand-orange text-white font-bold rounded-2xl flex items-center justify-center gap-3 shadow-[0_20px_40px_rgba(242,125,38,0.3)] hover:shadow-[0_25px_50px_rgba(242,125,38,0.4)] transition-all"
               >
-                Solicitar servicio ahora <ChevronRight size={24} />
+                {t('hero.cta_ahora')} <ChevronRight size={24} />
               </motion.a>
               <motion.a 
                 whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.15)" }}
@@ -617,7 +649,7 @@ export default function App() {
                 href="#contacto" 
                 className="px-10 py-5 bg-white/10 backdrop-blur-xl border border-white/10 text-white font-bold rounded-2xl flex items-center justify-center gap-3 transition-all"
               >
-                <Phone size={24} /> Llamar Directo
+                <Phone size={24} /> {t('hero.cta_llamar')}
               </motion.a>
             </div>
           </motion.div>
@@ -663,8 +695,8 @@ export default function App() {
                 <div className="flex items-center gap-2 text-brand-orange mb-4">
                   {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
                 </div>
-                <p className="font-bold text-xl mb-2">Servicio Premium</p>
-                <p className="text-sm text-gray-400 leading-relaxed">Más de 500 reseñas positivas de clientes satisfechos en toda la región.</p>
+                <p className="font-bold text-xl mb-2">{t('about.premium')}</p>
+                <p className="text-sm text-gray-400 leading-relaxed">{t('about.premium_desc')}</p>
               </motion.div>
             </motion.div>
 
@@ -673,22 +705,21 @@ export default function App() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-5xl md:text-6xl font-display font-bold mb-10 leading-tight">Expertos en mecánica móvil de <span className="text-brand-orange">alto rendimiento</span></h2>
+              <h2 className="text-5xl md:text-6xl font-display font-bold mb-10 leading-tight">{t('about.titulo_start')} <span className="text-brand-orange">{t('about.titulo_accent')}</span></h2>
               <p className="text-xl text-gray-400 mb-8 leading-relaxed">
-                En FastMec hemos revolucionado la forma de entender el taller mecánico. 
-                Llevamos la tecnología y la precisión de un taller de competición directamente a tu ubicación.
+                {t('about.desc1')}
               </p>
               <p className="text-lg text-gray-500 mb-12 leading-relaxed">
-                Nuestra unidad móvil está equipada con sistemas de diagnosis avanzada y herramientas de precisión para garantizar que cada reparación cumpla con los más altos estándares de la industria.
+                {t('about.desc2')}
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                 {[
-                  "Asistencia en carretera",
-                  "Maquinaria agrícola",
-                  "Vehículos industriales",
-                  "Diagnosis electrónica",
-                  "Garantía por escrito",
-                  "Precios cerrados"
+                  t('about.items.asistencia'),
+                  t('about.items.maquinaria'),
+                  t('about.items.vehiculos'),
+                  t('about.items.diagnosis'),
+                  t('about.items.garantia'),
+                  t('about.items.precios')
                 ].map((item, i) => (
                   <motion.div 
                     initial={{ opacity: 0, x: 20 }}
@@ -717,10 +748,9 @@ export default function App() {
             whileInView={{ opacity: 1, y: 0 }}
             className="text-center max-w-4xl mx-auto mb-24"
           >
-            <h2 className="text-5xl md:text-7xl font-display font-bold mb-8">Nuestros Servicios</h2>
+            <h2 className="text-5xl md:text-7xl font-display font-bold mb-8">{t('servicios.titulo')}</h2>
             <p className="text-xl text-gray-400 leading-relaxed">
-              Soluciones integrales para cualquier tipo de vehículo. 
-              Desde el mantenimiento más básico hasta las averías más complejas, todo en tu propia puerta.
+              {t('servicios.subtitulo')}
             </p>
           </motion.div>
 
@@ -732,33 +762,33 @@ export default function App() {
           >
             <ServiceCard 
               icon={Car} 
-              title="Reparación de Coches" 
-              description="Mantenimiento oficial, frenos, suspensión y mecánica general para turismos de todas las marcas."
+              title={t('servicios.coche.title')} 
+              description={t('servicios.coche.desc')} 
             />
             <ServiceCard 
               icon={Truck} 
-              title="Reparación de Camiones" 
-              description="Especialistas en sistemas neumáticos, hidráulicos y mecánica pesada para el transporte profesional."
+              title={t('servicios.camion.title')} 
+              description={t('servicios.camion.desc')} 
             />
             <ServiceCard 
               icon={Settings} 
-              title="Reparación de Tractores" 
-              description="Asistencia inmediata en campo para maquinaria agrícola. Evitamos paradas costosas en tu producción."
+              title={t('servicios.tractor.title')} 
+              description={t('servicios.tractor.desc')} 
             />
             <ServiceCard 
               icon={Zap} 
-              title="Diagnosis de Motor" 
-              description="Equipos de diagnosis de última generación para detectar fallos electrónicos y optimizar el rendimiento."
+              title={t('servicios.diagnosis.title')} 
+              description={t('servicios.diagnosis.desc')} 
             />
             <ServiceCard 
               icon={Droplets} 
-              title="Cambio de Aceite" 
-              description="Mantenimiento preventivo con lubricantes de alta gama y gestión profesional de residuos."
+              title={t('servicios.aceite.title')} 
+              description={t('servicios.aceite.desc')} 
             />
             <ServiceCard 
               icon={Wrench} 
-              title="Frenos y Baterías" 
-              description="Sustitución inmediata de componentes de seguridad. Trabajamos solo con primeras marcas."
+              title={t('servicios.frenos.title')} 
+              description={t('servicios.frenos.desc')} 
             />
           </motion.div>
         </div>
@@ -772,8 +802,8 @@ export default function App() {
             whileInView={{ opacity: 1, y: 0 }}
             className="text-center mb-24"
           >
-            <h2 className="text-5xl md:text-7xl font-display font-bold mb-6">Cómo Funciona</h2>
-            <p className="text-xl text-gray-400">Tu mecánico a un clic de distancia</p>
+            <h2 className="text-5xl md:text-7xl font-display font-bold mb-6">{t('como.titulo')}</h2>
+            <p className="text-xl text-gray-400">{t('como.subtitulo')}</p>
           </motion.div>
 
           <motion.div 
@@ -786,18 +816,18 @@ export default function App() {
             
             <Step 
               number="01" 
-              title="Contacto" 
-              description="Llámanos o escríbenos por WhatsApp. Indícanos tu ubicación y los síntomas de tu vehículo."
+              title={t('como.paso1.title')} 
+              description={t('como.paso1.desc')} 
             />
             <Step 
               number="02" 
-              title="Diagnóstico" 
-              description="Nuestra unidad móvil se desplaza a tu ubicación para realizar una evaluación técnica completa."
+              title={t('como.paso2.title')} 
+              description={t('como.paso2.desc')} 
             />
             <Step 
               number="03" 
-              title="Reparación" 
-              description="Solucionamos el problema in situ con garantía profesional. Vuelve a la carretera sin esperas."
+              title={t('como.paso3.title')} 
+              description={t('como.paso3.desc')} 
             />
           </motion.div>
         </div>
@@ -813,9 +843,9 @@ export default function App() {
           >
             <div className="absolute inset-0 bg-black/10" />
             <div className="relative z-10">
-              <h2 className="text-5xl md:text-7xl font-display font-bold text-white mb-10">¿Te has quedado tirado?</h2>
+              <h2 className="text-5xl md:text-7xl font-display font-bold text-white mb-10">{t('cta.titulo')}</h2>
               <p className="text-2xl text-white/90 mb-12 max-w-3xl mx-auto font-medium">
-                No llames a la grúa todavía. Nuestro equipo puede solucionar la mayoría de averías en el lugar.
+                {t('cta.subtitulo')}
               </p>
               <div className="flex flex-col sm:flex-row gap-6 justify-center">
                 <motion.a 
@@ -824,7 +854,7 @@ export default function App() {
                   href="tel:+34642379218" 
                   className="px-12 py-6 bg-white text-brand-orange font-bold text-xl rounded-3xl shadow-2xl flex items-center justify-center gap-3"
                 >
-                  <Phone size={28} /> Llamar Ahora
+                  <Phone size={28} /> {t('cta.llamar')}
                 </motion.a>
                 <motion.a 
                   whileHover={{ scale: 1.05 }}
@@ -832,7 +862,7 @@ export default function App() {
                   href="https://wa.me/34642379218" 
                   className="px-12 py-6 bg-brand-dark text-white font-bold text-xl rounded-3xl shadow-2xl flex items-center justify-center gap-3"
                 >
-                  <MessageCircle size={28} /> WhatsApp 24h
+                  <MessageCircle size={28} /> {t('cta.whatsapp')}
                 </motion.a>
               </div>
             </div>
@@ -849,16 +879,16 @@ export default function App() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-5xl md:text-6xl font-display font-bold mb-10">Estamos listos para <span className="text-brand-orange">ayudarte</span></h2>
+              <h2 className="text-5xl md:text-6xl font-display font-bold mb-10">{t('contacto.titulo_start')} <span className="text-brand-orange">{t('contacto.titulo_accent')}</span></h2>
               <p className="text-xl text-gray-400 mb-16 leading-relaxed">
-                Nuestros mecánicos están distribuidos estratégicamente para llegar a cualquier punto de la región en tiempo récord.
+                {t('contacto.subtitulo')}
               </p>
               
               <div className="space-y-8">
                 {[
-                  { icon: Phone, label: "Llamada Directa", value: "+34 642 379 218", color: "brand-orange" },
-                  { icon: MessageCircle, label: "WhatsApp Urgente", value: "Chat en vivo 24/7", color: "green-500" },
-                  { icon: Mail, label: "Correo Electrónico", value: "info@mariomec.es", color: "brand-orange" }
+                  { icon: Phone, label: t('contacto.labels.llamada'), value: "+34 642 379 218", color: "brand-orange" },
+                  { icon: MessageCircle, label: t('contacto.labels.whatsapp'), value: t('contacto.values.whatsapp'), color: "green-500" },
+                  { icon: Mail, label: t('contacto.labels.correo'), value: "info@fastmec.me", color: "brand-orange" }
                 ].map((item, i) => (
                   <motion.div 
                     initial={{ opacity: 0, y: 10 }}
@@ -886,41 +916,41 @@ export default function App() {
               className="glass-card p-12 md:p-16 relative"
             >
               <div className="absolute -top-10 -right-10 w-40 h-40 bg-brand-orange/20 blur-[80px] -z-10" />
-              <h3 className="text-3xl font-bold mb-10 font-display">Solicitar presupuesto</h3>
+              <h3 className="text-3xl font-bold mb-10 font-display">{t('contacto.form.titulo')}</h3>
               <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="grid md:grid-cols-2 gap-8">
                   <div className="space-y-3">
-                    <label className="text-sm font-bold text-gray-400 uppercase tracking-wider">Nombre</label>
+                    <label className="text-sm font-bold text-gray-400 uppercase tracking-wider">{t('contacto.form.nombre')}</label>
                     <input 
                       type="text" 
                       required
                       value={formData.name}
                       onChange={(e) => setFormData({...formData, name: e.target.value})}
                       className="w-full px-6 py-5 bg-brand-dark/50 border border-white/10 rounded-2xl focus:border-brand-orange focus:ring-1 focus:ring-brand-orange outline-none transition-all text-lg"
-                      placeholder="Tu nombre"
+                      placeholder={t('contacto.form.placeholder_nombre')}
                     />
                   </div>
                   <div className="space-y-3">
-                    <label className="text-sm font-bold text-gray-400 uppercase tracking-wider">Teléfono</label>
+                    <label className="text-sm font-bold text-gray-400 uppercase tracking-wider">{t('contacto.form.telefono')}</label>
                     <input 
                       type="tel" 
                       required
                       value={formData.phone}
                       onChange={(e) => setFormData({...formData, phone: e.target.value})}
                       className="w-full px-6 py-5 bg-brand-dark/50 border border-white/10 rounded-2xl focus:border-brand-orange focus:ring-1 focus:ring-brand-orange outline-none transition-all text-lg"
-                      placeholder="Tu móvil"
+                      placeholder={t('contacto.form.placeholder_telefono')}
                     />
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <label className="text-sm font-bold text-gray-400 uppercase tracking-wider">Vehículo y Problema</label>
+                  <label className="text-sm font-bold text-gray-400 uppercase tracking-wider">{t('contacto.form.vehiculo')}</label>
                   <textarea 
                     rows={5}
                     required
                     value={formData.message}
                     onChange={(e) => setFormData({...formData, message: e.target.value})}
                     className="w-full px-6 py-5 bg-brand-dark/50 border border-white/10 rounded-2xl focus:border-brand-orange focus:ring-1 focus:ring-brand-orange outline-none transition-all text-lg resize-none"
-                    placeholder="Ej: BMW Serie 3, no arranca. Estoy en Calle Mayor..."
+                    placeholder={t('contacto.form.placeholder_mensaje')}
                   ></textarea>
                 </div>
                 <motion.button 
@@ -929,7 +959,7 @@ export default function App() {
                   type="submit"
                   className="w-full py-6 bg-brand-orange text-white font-bold text-xl rounded-2xl shadow-2xl hover:shadow-brand-orange/20 transition-all"
                 >
-                  Enviar Solicitud Urgente
+                  {t('contacto.form.enviar')}
                 </motion.button>
               </form>
             </motion.div>
@@ -946,36 +976,36 @@ export default function App() {
                 FAST<span className="text-white">MEC</span>
               </span>
               <p className="text-gray-500 text-lg leading-relaxed mb-10">
-                Líderes en mecánica móvil. Profesionalidad, rapidez y transparencia en cada reparación.
+                {t('footer.desc')}
               </p>
             </div>
 
             <div>
-              <h4 className="text-white font-bold text-xl mb-10 font-display">Especialidades</h4>
+              <h4 className="text-white font-bold text-xl mb-10 font-display">{t('footer.especialidades')}</h4>
               <ul className="space-y-6 text-gray-500 font-medium">
-                <li><a href="#servicios" className="hover:text-brand-orange transition-colors">Turismos y SUVs</a></li>
-                <li><a href="#servicios" className="hover:text-brand-orange transition-colors">Transporte Pesado</a></li>
-                <li><a href="#servicios" className="hover:text-brand-orange transition-colors">Maquinaria Agrícola</a></li>
-                <li><a href="#servicios" className="hover:text-brand-orange transition-colors">Sistemas Híbridos</a></li>
+                <li><a href="#servicios" className="hover:text-brand-orange transition-colors">{t('footer.items.turismos')}</a></li>
+                <li><a href="#servicios" className="hover:text-brand-orange transition-colors">{t('footer.items.transporte')}</a></li>
+                <li><a href="#servicios" className="hover:text-brand-orange transition-colors">{t('footer.items.maquinaria')}</a></li>
+                <li><a href="#servicios" className="hover:text-brand-orange transition-colors">{t('footer.items.hibridos')}</a></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-white font-bold text-xl mb-10 font-display">Navegación</h4>
+              <h4 className="text-white font-bold text-xl mb-10 font-display">{t('footer.navegacion')}</h4>
               <ul className="space-y-6 text-gray-500 font-medium">
-                <li><a href="#inicio" className="hover:text-brand-orange transition-colors">Inicio</a></li>
-                <li><a href="#sobre-nosotros" className="hover:text-brand-orange transition-colors">Sobre Nosotros</a></li>
-                <li><a href="#servicios" className="hover:text-brand-orange transition-colors">Servicios</a></li>
-                <li><a href="#contacto" className="hover:text-brand-orange transition-colors">Contacto</a></li>
+                <li><a href="#inicio" className="hover:text-brand-orange transition-colors">{t('nav.inicio')}</a></li>
+                <li><a href="#sobre-nosotros" className="hover:text-brand-orange transition-colors">{t('nav.sobre')}</a></li>
+                <li><a href="#servicios" className="hover:text-brand-orange transition-colors">{t('nav.servicios')}</a></li>
+                <li><a href="#contacto" className="hover:text-brand-orange transition-colors">{t('nav.contacto')}</a></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-white font-bold text-xl mb-10 font-display">Contacto</h4>
+              <h4 className="text-white font-bold text-xl mb-10 font-display">{t('footer.contacto')}</h4>
               <div className="space-y-8">
                 <div className="flex gap-4 text-gray-500">
                   <MapPin size={24} className="text-brand-orange flex-shrink-0" />
-                  <p className="font-medium">Servicio móvil en toda la Comunidad de Málaga y provincias limítrofes.</p>
+                  <p className="font-medium">{t('footer.ubicacion')}</p>
                 </div>
                 <div className="flex gap-4 text-gray-500">
                   <Phone size={24} className="text-brand-orange flex-shrink-0" />
@@ -983,7 +1013,7 @@ export default function App() {
                 </div>
                 <div className="flex gap-4 text-gray-500">
                   <Clock size={24} className="text-brand-orange flex-shrink-0" />
-                  <p className="font-medium">Disponible 24 horas / 365 días</p>
+                  <p className="font-medium">{t('footer.disponible')}</p>
                 </div>
               </div>
             </div>
@@ -991,26 +1021,26 @@ export default function App() {
 
           <div className="border-t border-white/5 pt-12 flex flex-col md:flex-row justify-between items-center gap-8">
             <p className="text-gray-600 text-sm font-medium">
-              © 2024 FastMec. Todos los derechos reservados.
+              {t('footer.derechos')}
             </p>
             <div className="flex gap-10 text-gray-600 text-sm font-medium">
               <button 
                 onClick={() => setShowLegal(true)}
                 className="hover:text-white transition-colors"
               >
-                Aviso Legal
+                {t('footer.aviso')}
               </button>
               <button 
                 onClick={() => setShowPrivacy(true)}
                 className="hover:text-white transition-colors"
               >
-                Privacidad
+                {t('footer.privacidad')}
               </button>
               <button 
                 onClick={() => setShowCookies(true)}
                 className="hover:text-white transition-colors"
               >
-                Cookies
+                {t('footer.cookies')}
               </button>
             </div>
           </div>
